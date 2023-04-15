@@ -1,7 +1,7 @@
 `include "lib_cpu.svh"
 
 module decoder import lib_cpu :: *; (
-  input  logic [7:0] data,
+  input  logic [31:0] pc,
   output OPECODE     opecode,
   output logic [3:0] imm
 );
