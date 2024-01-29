@@ -9,7 +9,9 @@ module fetcher(
 
     logic [MEM_SIZE:0][31:0]memory;
     assign memory = '0;
-    assign memory[20] = '1;
+    assign memory[16] = 32'b11111000001111100000111110010111;
+    assign memory[20] = 32'b11111000001111100000111110110111;
+    assign memory[24] = 32'b00000111110000011111000001101111;
     assign inst = memory[addr];
 
 endmodule
