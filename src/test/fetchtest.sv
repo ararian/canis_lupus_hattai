@@ -1,7 +1,8 @@
 module fetchtest;
 wire CLK, RST;
 
-cpu cpu(.CLK(CLK), .RST(RST));
+
+rv_cpu rv_cpu(.CLK(CLK), .RST(RST));
 
 always begin
     CLK = 1'b1; #50;
