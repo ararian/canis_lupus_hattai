@@ -1,9 +1,8 @@
-parameter MEM_SIZE = 4000-1;
-
+import defs::*;
 
 module rv_cpu(
-    input wire CLK, 
-    input wire RST
+    input logic CLK, 
+    input logic RST
     );
 
     reg [31:0] pc_reg;
