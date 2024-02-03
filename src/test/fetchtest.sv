@@ -9,7 +9,7 @@ always begin
 end
 
 initial begin
-    RST <= 1'b1; #100;
+    RST <= 1'b1; #200;
     RST <= 1'b0; #50;
     #1000;
     $finish;
