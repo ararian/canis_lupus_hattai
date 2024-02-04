@@ -6,12 +6,12 @@ module rv_cpu(
     );
 
     //レジスタ
-    reg[31:0] pc_reg;
-    reg[31:0][31:0] general_reg;
+    reg[BIN_DIG-1:0] pc_reg;
+    reg[31:0][BIN_DIG-1:0] general_reg;
     assign general_reg = '0;
 
     //命令コード
-    reg[31:0] inst;
+    reg[BIN_DIG-1:0] inst;
 
     //デコード命令
     logic[6:0] opcode;
@@ -22,13 +22,6 @@ module rv_cpu(
     logic[7:0] funct7;
     logic[20:0] imm;
 
-    //インターフェースの定義
-    fetchToDecode fetchToDecode(.CLK(CLK), .RST(RST));
-    assign fetchToDecode.addr = pc_reg;
-
-    decodeToExec decodeToExec(.CLK(CLK), .RST(RST));
-
-
     always_ff @(posedge CLK)begin
         if (RST) begin
             pc_reg <= 32'h0;
@@ -37,8 +30,21 @@ module rv_cpu(
         end
     end
 
+    //インターフェースのインスタンス化
+    fetchToDecode fetchToDecode(.CLK(CLK), .RST(RST));
+    decodeToExec decodeToExec(.CLK(CLK), .RST(RST));
+    execToWriteback execToWriteback(.CLK(CLK), .RST(RST));
+    topToExec topToExec(.CLK(CLK), .RST(RST));
+
+    //インターフェースへの割り当て
+    assign fetchToDecode.addr = pc_reg;
+    assign topToExec.curr_pc_reg = pc_reg;
+    assign topToExec.curr_general_reg = general_reg;
+
+    //モジュールのインスタンス化
     fetcher fetcher(.fetchToDecode(fetchToDecode.fetch));
     decoder decoder(.fetchToDecode(fetchToDecode.decode), .decodeToExec(decodeToExec.decode));
+    exec exec(.decodeToExec(decodeToExec.exec), .execToWriteback(execToWriteback.exec), .topToExec(topToExec.exec));
 
     //実行ログ確認用の配線
     assign opcode = decodeToExec.next_opcode;
@@ -48,7 +54,6 @@ module rv_cpu(
     assign funct3 = decodeToExec.next_funct3;
     assign funct7 = decodeToExec.next_funct7;
     assign imm = decodeToExec.next_imm;
-
 
 endmodule
 

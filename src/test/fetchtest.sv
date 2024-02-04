@@ -1,4 +1,4 @@
-module fetchtest;
+module tb;
 
 logic CLK, RST;
 rv_cpu rv_cpu(.CLK(CLK), .RST(RST));

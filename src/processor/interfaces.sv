@@ -1,7 +1,9 @@
+import defs::*;
+
 interface fetchToDecode(input logic CLK, RST);
-    reg[31:0] addr;
-    reg[31:0] curr_inst;
-    reg[31:0] next_inst;
+    reg[BIN_DIG-1:0] addr;
+    reg[BIN_DIG-1:0] curr_inst;
+    reg[BIN_DIG-1:0] next_inst;
 
     modport fetch(
         input addr,
@@ -73,4 +75,31 @@ interface decodeToExec(input logic CLK, RST);
             next_imm <= curr_imm;
         end
     end
+endinterface
+
+interface execToWriteback(input CLK, RST);
+    logic [BIN_DIG-1:0] next_pc_reg;
+    logic [BIN_DIG-1:0] next_rd_value;
+    logic[4:0] next_rd;
+    
+    modport exec(
+        output next_pc_reg, 
+        output next_rd_value, 
+        output next_rd
+    );
+    modport writeback(
+        input next_pc_reg, 
+        input next_rd_value, 
+        input next_rd
+    );
+endinterface
+
+interface topToExec(input CLK, RST);
+    logic [BIN_DIG-1:0] curr_pc_reg;
+    reg[31:0][BIN_DIG-1:0] curr_general_reg;
+
+    modport exec(
+        input curr_pc_reg, 
+        input curr_general_reg
+    );
 endinterface
