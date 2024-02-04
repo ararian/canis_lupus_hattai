@@ -5,13 +5,9 @@ import defs::*;
 module fetcher(
     fetchToDecode.fetch fetchToDecode
     );
-
-    logic [MEM_SIZE-1:0][31:0]memory;
-    assign memory = '0;
-    assign memory[4] = 32'h000140EF;
-    assign memory[16] = 32'b11111000001111100000111110010111;
-    assign memory[20] = 32'b11111000001111100000111110110111;
-    assign memory[24] = 32'b00000111110000011111000001101111;
+    logic [31:0]memory [MEM_SIZE-1:0];
+    initial
+        $readmemh("memory_data.txt", memory);
     assign fetchToDecode.curr_inst = memory[fetchToDecode.addr];
 
 endmodule
