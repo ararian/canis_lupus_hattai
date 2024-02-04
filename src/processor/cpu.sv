@@ -10,6 +10,8 @@ module rv_cpu(
     reg[31:0][BIN_DIG-1:0] general_reg;
     assign general_reg = '0;
 
+    logic loac_active;
+
     //命令コード
     reg[BIN_DIG-1:0] inst;
 
@@ -32,28 +34,30 @@ module rv_cpu(
 
     //インターフェースのインスタンス化
     fetchToDecode fetchToDecode(.CLK(CLK), .RST(RST));
-    decodeToExec decodeToExec(.CLK(CLK), .RST(RST));
+    decodeToExecOrDmem decodeToExecOrDmem(.CLK(CLK), .RST(RST));
     execToWriteback execToWriteback(.CLK(CLK), .RST(RST));
-    topToExec topToExec(.CLK(CLK), .RST(RST));
+    topToExecOrDmem topToExecOrDmem(.CLK(CLK), .RST(RST));
+    dmemToWriteback dmemToWriteback(.CLK(CLK), .RST(RST));
 
     //インターフェースへの割り当て
     assign fetchToDecode.addr = pc_reg;
-    assign topToExec.curr_pc_reg = pc_reg;
-    assign topToExec.curr_general_reg = general_reg;
+    assign topToExecOrDmem.curr_pc_reg = pc_reg;
+    assign topToExecOrDmem.curr_general_reg = general_reg;
 
     //モジュールのインスタンス化
     fetcher fetcher(.fetchToDecode(fetchToDecode.fetch));
-    decoder decoder(.fetchToDecode(fetchToDecode.decode), .decodeToExec(decodeToExec.decode));
-    exec exec(.decodeToExec(decodeToExec.exec), .execToWriteback(execToWriteback.exec), .topToExec(topToExec.exec));
+    decoder decoder(.fetchToDecode(fetchToDecode.decode), .decodeToExecOrDmem(decodeToExecOrDmem.decode));
+    exec exec(.decodeToExecOrDmem(decodeToExecOrDmem.execOrDmem), .execToWriteback(execToWriteback.exec), .topToExecOrDmem(topToExecOrDmem.exec));
+    memaccess memaccess(.decodeToExecOrDmem(decodeToExecOrDmem.execOrDmem), .topToExecOrDmem(topToExecOrDmem.dmem), .dmemToWriteback(dmemToWriteback.dmem), .load_active(load_active), .CLK(CLK));
 
     //実行ログ確認用の配線
-    assign opcode = decodeToExec.next_opcode;
-    assign rd = decodeToExec.next_rd;
-    assign rs1 = decodeToExec.next_rs1;
-    assign rs2 = decodeToExec.next_rs2;
-    assign funct3 = decodeToExec.next_funct3;
-    assign funct7 = decodeToExec.next_funct7;
-    assign imm = decodeToExec.next_imm;
+    assign opcode = decodeToExecOrDmem.next_opcode;
+    assign rd = decodeToExecOrDmem.next_rd;
+    assign rs1 = decodeToExecOrDmem.next_rs1;
+    assign rs2 = decodeToExecOrDmem.next_rs2;
+    assign funct3 = decodeToExecOrDmem.next_funct3;
+    assign funct7 = decodeToExecOrDmem.next_funct7;
+    assign imm = decodeToExecOrDmem.next_imm;
 
 endmodule
 

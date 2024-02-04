@@ -5,12 +5,10 @@ import defs::*;
 module fetcher(
     fetchToDecode.fetch fetchToDecode
     );
-    logic [BIN_DIG-1:0]memory [MEM_SIZE-1:0];
-    logic [BIN_DIG-1:0]memtest;
+    logic [BIN_DIG-1:0]i_mem [MEM_SIZE-1:0];
     initial
-        $readmemh("memory_data.txt", memory);
-    assign fetchToDecode.curr_inst = memory[fetchToDecode.addr];
-    assign memtest = memory[fetchToDecode.addr];
+        $readmemh("memory_data.txt", i_mem);
+    assign fetchToDecode.curr_inst = i_mem[fetchToDecode.addr];
 
 endmodule
 
