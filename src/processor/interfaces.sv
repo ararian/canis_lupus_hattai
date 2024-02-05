@@ -111,14 +111,16 @@ interface dmemToWriteback(input CLK, RST);
 
     logic [BIN_DIG-1:0] next_rd;
     logic [BIN_DIG-1:0] next_rd_value;
+    logic load_active;
 
     modport dmem(
         output next_rd, 
-        output next_rd_value
+        output next_rd_value,
+        output load_active
     );
     modport writeback(
         input next_rd,
-        input next_rd_value
+        input next_rd_value, 
+        input load_active        
     );
-
 endinterface
