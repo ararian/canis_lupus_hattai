@@ -124,3 +124,30 @@ interface dmemToWriteback(input CLK, RST);
         input load_active        
     );
 endinterface
+
+interface writebackToTop(input CLK, RST);
+
+    logic [BIN_DIG-1:0] next_pc_reg;
+    logic [BIN_DIG-1:0] next_rd_value;
+    logic[4:0] next_rd;
+
+    logic [BIN_DIG-1:0] fixed_pc_reg;
+    logic [BIN_DIG-1:0] fixed_rd_value;
+    logic[4:0] fixed_rd;
+
+    modport writeback(
+        output next_pc_reg, 
+        output next_rd_value,
+        output next_rd
+    );
+
+    always_ff @(posedge CLK)begin
+        if(RST) begin
+            fixed_pc_reg <= '0;
+        end else begin
+            fixed_pc_reg <= next_pc_reg;
+            fixed_rd <= next_rd;
+            fixed_rd_value <= next_rd_value;
+        end
+    end
+endinterface

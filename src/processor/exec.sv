@@ -25,42 +25,42 @@ always_comb begin
             if(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] == topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2])begin
                 assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
             end else begin
-                assign execToWriteback.next_rd_value = topToExecOrDmem.curr_pc_reg + 32'h4;
+                assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
             end
         end
         BNE: begin
             if(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] != topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2])begin
                 assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
             end else begin
-                assign execToWriteback.next_rd_value = topToExecOrDmem.curr_pc_reg + 32'h4;
+                assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
             end
         end
         BLT: begin
             if($signed(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1]) < $signed(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2]))begin
                 assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
             end else begin
-                assign execToWriteback.next_rd_value = topToExecOrDmem.curr_pc_reg + 32'h4;
+                assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
             end
         end
         BGE: begin
             if($signed(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1]) >= $signed(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2]))begin
                 assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
             end else begin
-                assign execToWriteback.next_rd_value = topToExecOrDmem.curr_pc_reg + 32'h4;
+                assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
             end
         end
         BLTU: begin
             if(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] < topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2])begin
                 assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
             end else begin
-                assign execToWriteback.next_rd_value = topToExecOrDmem.curr_pc_reg + 32'h4;
+                assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
             end
         end
         BGEU: begin
             if(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] >= topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2])begin
                 assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
             end else begin
-                assign execToWriteback.next_rd_value = topToExecOrDmem.curr_pc_reg + 32'h4;
+                assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
             end
         end      
     endcase
@@ -71,12 +71,15 @@ always_comb begin
     case({decodeToExecOrDmem.next_funct7, decodeToExecOrDmem.next_funct3, decodeToExecOrDmem.next_opcode})
         ADD: begin
             assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] + topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         SUB: begin
             assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] - topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         SLL: begin
             assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] << topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         SLT: begin
             if($signed(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1]) < $signed(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2])) begin
@@ -84,6 +87,7 @@ always_comb begin
             end else begin
                 assign execToWriteback.next_rd_value = 32'h0;
             end
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         SLTU: begin
             if(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] < topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2]) begin
@@ -91,12 +95,15 @@ always_comb begin
             end else begin
                 assign execToWriteback.next_rd_value = 32'h0;
             end
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         XOR: begin
             assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] ^ topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         SRL: begin
             assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] >> topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         SRA: begin
             assign tmp = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1][31];
@@ -104,13 +111,15 @@ always_comb begin
             for(int i=0;i<decodeToExecOrDmem.next_rs2;i++)begin
                 assign execToWriteback.next_rd_value[BIN_DIG-1-i] = tmp;
             end
-
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         OR: begin
             assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] | topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         AND: begin
             assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] & topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
     endcase
 end
@@ -124,6 +133,7 @@ always_comb begin
         end
         ADDI: begin
             assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] +  {{20{decodeToExecOrDmem.next_imm[11]}}, decodeToExecOrDmem.next_imm[11:0]};
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         SLTI: begin
             if(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] < $signed(decodeToExecOrDmem.next_imm))begin 
@@ -131,6 +141,7 @@ always_comb begin
             end else begin
                 assign execToWriteback.next_rd_value = 32'h0;
             end
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         SLTIU: begin
             if(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] < decodeToExecOrDmem.next_imm)begin 
@@ -138,15 +149,19 @@ always_comb begin
             end else begin
                 assign execToWriteback.next_rd_value = 32'h0;
             end
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         XORI: begin
             assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] ^ {{20{decodeToExecOrDmem.next_imm[11]}}, decodeToExecOrDmem.next_imm[11:0]};
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         ORI: begin
             assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] | {{20{decodeToExecOrDmem.next_imm[11]}}, decodeToExecOrDmem.next_imm[11:0]};
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         ANDI: begin
             assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] & {{20{decodeToExecOrDmem.next_imm[11]}}, decodeToExecOrDmem.next_imm[11:0]};
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
     endcase
 end
@@ -157,9 +172,11 @@ always_comb begin
     case({decodeToExecOrDmem.next_funct7, decodeToExecOrDmem.next_funct3, decodeToExecOrDmem.next_opcode})
         SLLI: begin
             assign execToWriteback.next_rd_value =  topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] << decodeToExecOrDmem.next_imm[5:0];
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         SRLI: begin
             assign execToWriteback.next_rd_value =  topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] >> decodeToExecOrDmem.next_imm[5:0];
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
         SRAI: begin
             assign tmp = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1][31];
@@ -167,6 +184,7 @@ always_comb begin
             for(int i=0;i<decodeToExecOrDmem.next_imm[5:0];i++)begin
                 assign execToWriteback.next_rd_value[BIN_DIG-1-i] = tmp;
             end
+            assign execToWriteback.next_pc_reg = topToExecOrDmem.curr_pc_reg + 32'h4;
         end
     endcase
 end
