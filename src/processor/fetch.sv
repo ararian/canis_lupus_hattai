@@ -8,7 +8,7 @@ module fetcher(
     logic [BIN_DIG-1:0]i_mem [MEM_SIZE-1:0];
     initial
         $readmemh("memory_data.txt", i_mem);
-    assign fetchToDecode.curr_inst = i_mem[fetchToDecode.addr];
+    assign fetchToDecode.curr_inst = i_mem[fetchToDecode.curr_pc_reg];
 
 endmodule
 

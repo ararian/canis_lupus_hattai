@@ -1,27 +1,32 @@
 import defs::*;
 
 interface fetchToDecode(input logic CLK, RST);
-    reg[BIN_DIG-1:0] addr;
+    reg[BIN_DIG-1:0] curr_pc_reg;
+    reg[BIN_DIG-1:0] next_pc_reg;
     reg[BIN_DIG-1:0] curr_inst;
     reg[BIN_DIG-1:0] next_inst;
 
     modport fetch(
-        input addr,
+        input curr_pc_reg,
         output curr_inst
     );
     modport decode(
+        input next_pc_reg, 
         input next_inst
     );
     always_ff @(posedge CLK)begin
         if(RST) begin
             next_inst <= '0;
+            curr_pc_reg <= '0;
         end else begin
             next_inst <= curr_inst;
+            next_pc_reg <= curr_pc_reg;
         end
     end
 endinterface
 
 interface decodeToExecOrDmem(input logic CLK, RST);
+    logic[BIN_DIG-1:0] curr_pc_reg;
     logic[6:0] curr_opcode;
     logic[4:0] curr_rd;
     logic[4:0] curr_rs1;
@@ -30,6 +35,7 @@ interface decodeToExecOrDmem(input logic CLK, RST);
     logic[7:0] curr_funct7;
     logic[20:0] curr_imm;
 
+    logic[BIN_DIG-1:0] next_pc_reg;
     logic[6:0] next_opcode;
     logic[4:0] next_rd;
     logic[4:0] next_rs1;
@@ -39,6 +45,7 @@ interface decodeToExecOrDmem(input logic CLK, RST);
     logic[20:0] next_imm;
 
     modport decode(
+        output curr_pc_reg, 
         output curr_opcode, 
         output curr_rd, 
         output curr_rs1, 
@@ -48,6 +55,7 @@ interface decodeToExecOrDmem(input logic CLK, RST);
         output curr_imm
     );
     modport execOrDmem(
+        input next_pc_reg, 
         input next_opcode, 
         input next_rd, 
         input next_rs1, 
@@ -58,6 +66,7 @@ interface decodeToExecOrDmem(input logic CLK, RST);
     );
     always_ff @(posedge CLK)begin
         if(RST) begin
+            next_pc_reg <= '0;
             next_opcode <= '0;
             next_rd <= '0;
             next_rs1 <= '0;
@@ -66,6 +75,7 @@ interface decodeToExecOrDmem(input logic CLK, RST);
             next_funct7 <= '0;
             next_imm <= '0;
         end else begin
+            next_pc_reg <= curr_pc_reg;
             next_opcode <= curr_opcode;
             next_rd <= curr_rd;
             next_rs1 <= curr_rs1;
@@ -95,11 +105,9 @@ interface execToWriteback(input CLK, RST);
 endinterface
 
 interface topToExecOrDmem(input CLK, RST);
-    logic [BIN_DIG-1:0] curr_pc_reg;
     reg[31:0][BIN_DIG-1:0] curr_general_reg;
 
     modport exec(
-        input curr_pc_reg, 
         input curr_general_reg
     );
     modport dmem(

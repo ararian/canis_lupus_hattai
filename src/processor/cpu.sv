@@ -44,8 +44,7 @@ module rv_cpu(
         assign pc_reg = writebackToTop.fixed_pc_reg;
         assign general_reg[writebackToTop.fixed_rd] = writebackToTop.fixed_rd_value;
         //インターフェースへの割り当て
-        assign fetchToDecode.addr = pc_reg;
-        assign topToExecOrDmem.curr_pc_reg = pc_reg;
+        assign fetchToDecode.curr_pc_reg = pc_reg;
         assign topToExecOrDmem.curr_general_reg = general_reg;
     end
     //モジュールのインスタンス化

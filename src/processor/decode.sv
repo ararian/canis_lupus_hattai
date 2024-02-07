@@ -5,6 +5,7 @@ module decoder(
     decodeToExecOrDmem.decode decodeToExecOrDmem
 );
 
+    assign decodeToExecOrDmem.curr_pc_reg = fetchToDecode.next_pc_reg;
     assign decodeToExecOrDmem.curr_opcode = fetchToDecode.next_inst[6:0];
 
     always_comb begin
