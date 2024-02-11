@@ -84,14 +84,11 @@ always_comb begin
             execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] ^ topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
         end
         SRL: begin
-            execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] >> topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
+            execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] >>> topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
         end
         SRA: begin
             tmp = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1][31];
             execToWriteback.next_rd_value = $signed(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1]) >>> decodeToExecOrDmem.next_rs2;
-            // for(int i=0;i<decodeToExecOrDmem.next_rs2;i++)begin
-            //     execToWriteback.next_rd_value[BIN_DIG-1-i] = tmp;
-            // end
         end
         OR: begin
             execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] | topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
@@ -146,15 +143,12 @@ always_comb begin
             execToWriteback.next_rd_value =  topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] << decodeToExecOrDmem.next_imm[5:0];
         end
         SRLI: begin
-            execToWriteback.next_rd_value =  topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] >> decodeToExecOrDmem.next_imm[5:0];
+            execToWriteback.next_rd_value =  topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] >>> decodeToExecOrDmem.next_imm[5:0];
         end
-        // SRAI: begin
-        //     assign tmp = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1][31];
-        //     assign execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] >> decodeToExecOrDmem.next_imm[5:0];
-        //     for(int i=0;i<decodeToExecOrDmem.next_imm[5:0];i++)begin
-        //         assign execToWriteback.next_rd_value[BIN_DIG-1-i] = tmp;
-        //     end
-        // end
+        SRAI: begin
+            assign tmp = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1][31];
+            assign execToWriteback.next_rd_value = $signed(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1]) >>> decodeToExecOrDmem.next_imm[5:0];
+        end
     endcase
 end
 
