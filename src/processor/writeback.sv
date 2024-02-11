@@ -6,13 +6,12 @@ module writeback(
 );
     always_comb begin
         if(dmemToWriteback.load_active) begin
-            assign writebackToTop.next_rd = dmemToWriteback.next_rd;
-            assign writebackToTop.next_rd_value = dmemToWriteback.next_rd_value;
-            assign writebackToTop.next_pc_reg = execToWriteback.next_pc_reg + 32'h4;
+            writebackToTop.next_rd = dmemToWriteback.next_rd;
+            writebackToTop.next_rd_value = dmemToWriteback.next_rd_value;
         end else begin
-            assign writebackToTop.next_rd = execToWriteback.next_rd;
-            assign writebackToTop.next_rd_value = execToWriteback.next_rd_value;
-            assign writebackToTop.next_pc_reg = execToWriteback.next_pc_reg;
+            writebackToTop.next_rd = execToWriteback.next_rd;
+            writebackToTop.next_rd_value = execToWriteback.next_rd_value;
+            writebackToTop.next_pc_reg = execToWriteback.next_pc_reg;
         end
     end
 endmodule

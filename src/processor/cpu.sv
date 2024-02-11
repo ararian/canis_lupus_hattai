@@ -18,13 +18,31 @@ module rv_cpu(
     logic[7:0] funct7;
     logic[20:0] imm;
 
-    // always_ff @(posedge CLK)begin
-    //     if (RST) begin
-    //         pc_reg <= 32'h0;
+    //制御ハザード用フラグ
+    logic branch, jamp;
+    logic ctrl_hazard;
+
+    // assign branch = 1'b0;
+    // assign jamp = 1'b0;
+
+    // always_comb begin
+    //     if(branch | jamp) begin
+    //         ctrl_hazard = 1'b1;
     //     end else begin
-    //         pc_reg <= pc_reg + 32'h4;
+    //         ctrl_hazard = 1'b0;
     //     end
     // end
+
+    always_ff @(posedge CLK)begin
+        if (RST) begin
+            pc_reg <= 32'h0;
+        end else if(ctrl_hazard)begin
+            pc_reg <= writebackToTop.fixed_pc_reg;
+            ctrl_hazard <= 1'b0;
+        end else begin
+            pc_reg <= pc_reg + 32'h4;
+        end
+    end
 
     always_ff @(posedge CLK)begin
         if (RST) begin
@@ -41,11 +59,10 @@ module rv_cpu(
 
     always_comb begin
         //レジスタへ次の値を割り当て
-        assign pc_reg = writebackToTop.fixed_pc_reg;
-        assign general_reg[writebackToTop.fixed_rd] = writebackToTop.fixed_rd_value;
+        general_reg[writebackToTop.fixed_rd] = writebackToTop.fixed_rd_value;
         //インターフェースへの割り当て
-        assign fetchToDecode.curr_pc_reg = pc_reg;
-        assign topToExecOrDmem.curr_general_reg = general_reg;
+        fetchToDecode.curr_pc_reg = pc_reg;
+        topToExecOrDmem.curr_general_reg = general_reg;
     end
     //モジュールのインスタンス化
     fetcher fetcher(.fetchToDecode(fetchToDecode.fetch));
