@@ -8,7 +8,6 @@ module exec(
 );
 
 assign execToWriteback.next_rd = decodeToExecOrDmem.next_rd;
-//TODO：分岐命令実行時のフラッシュ処理等を実施する
 //TODO：共通部分のモジュール化
 
 //J形式の命令記述
@@ -24,37 +23,37 @@ always_comb begin
     case({decodeToExecOrDmem.next_funct3, decodeToExecOrDmem.next_opcode})
         BEQ: begin
             if(writebackToForward.general_reg[decodeToExecOrDmem.next_rs1] == writebackToForward.general_reg[decodeToExecOrDmem.next_rs2])begin
-                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
+                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]};
                 hazard.branch = 1'b1;
             end
         end
         BNE: begin
             if(writebackToForward.general_reg[decodeToExecOrDmem.next_rs1] != writebackToForward.general_reg[decodeToExecOrDmem.next_rs2])begin
-                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
+                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]};
                 hazard.branch = 1'b1;
             end
         end
         BLT: begin
             if($signed(writebackToForward.general_reg[decodeToExecOrDmem.next_rs1]) < $signed(writebackToForward.general_reg[decodeToExecOrDmem.next_rs2]))begin
-                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
+                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]};
                 hazard.branch = 1'b1;
             end
         end
         BGE: begin
             if($signed(writebackToForward.general_reg[decodeToExecOrDmem.next_rs1]) >= $signed(writebackToForward.general_reg[decodeToExecOrDmem.next_rs2]))begin
-                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
+                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]};
                 hazard.branch = 1'b1;
             end
         end
         BLTU: begin
             if(writebackToForward.general_reg[decodeToExecOrDmem.next_rs1] < writebackToForward.general_reg[decodeToExecOrDmem.next_rs2])begin
-                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
+                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]};
                 hazard.branch = 1'b1;
             end
         end
         BGEU: begin
             if(writebackToForward.general_reg[decodeToExecOrDmem.next_rs1] >= writebackToForward.general_reg[decodeToExecOrDmem.next_rs2])begin
-                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]}; //TODO：符号拡張の指定範囲やデータサイズの確認
+                execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{19{decodeToExecOrDmem.next_imm[12]}}, decodeToExecOrDmem.next_imm[12:0]};
                 hazard.branch = 1'b1;
             end
         end      
