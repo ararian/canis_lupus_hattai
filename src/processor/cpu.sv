@@ -5,10 +5,6 @@ module rv_cpu(
     input logic RST
     );
 
-    //レジスタ
-    reg[BIN_DIG-1:0] pc_reg;
-    reg[31:0][BIN_DIG-1:0] general_reg;
-
     //デコード命令
     logic[6:0] opcode;
     logic[4:0] rd;
@@ -18,60 +14,28 @@ module rv_cpu(
     logic[7:0] funct7;
     logic[BIN_DIG-1:0] imm;
 
-    //制御ハザード用フラグ
-    logic branch, jamp;
-    logic ctrl_hazard;
+    // //制御ハザード用フラグ
+    // logic branch, jamp;
+    // logic ctrl_hazard;
 
-    // assign branch = 1'b0;
-    // assign jamp = 1'b0;
+    // assign ctrl_hazard = branch | jamp;
 
-    // always_comb begin
-    //     if(branch | jamp) begin
-    //         ctrl_hazard = 1'b1;
-    //     end else begin
-    //         ctrl_hazard = 1'b0;
-    //     end
-    // end
-
-    always_ff @(posedge CLK)begin
-        if (RST) begin
-            pc_reg <= 32'h0;
-        end else if(ctrl_hazard)begin
-            pc_reg <= writebackToTop.fixed_pc_reg;
-            ctrl_hazard <= 1'b0;
-        end else begin
-            pc_reg <= pc_reg + 32'h4;
-        end
-    end
-
-    always_ff @(posedge CLK)begin
-        if (RST) begin
-            general_reg <= '0;
-        end else begin
-            general_reg[writebackToTop.next_rd] <= writebackToTop.next_rd_value;
-        end
-    end
     //インターフェースのインスタンス化
-    fetchToDecode fetchToDecode(.CLK(CLK), .RST(RST));
-    decodeToExecOrDmem decodeToExecOrDmem(.CLK(CLK), .RST(RST));
+    hazard hazard(.CLK(CLK), .RST(RST));
+    fetchToDecode fetchToDecode(.CLK(CLK), .RST(RST), .hazard(hazard.fToD));
+    decodeToExecOrDmem decodeToExecOrDmem(.CLK(CLK), .RST(RST), .hazard(hazard.dToED));
     execToWriteback execToWriteback(.CLK(CLK), .RST(RST));
     topToExecOrDmem topToExecOrDmem(.CLK(CLK), .RST(RST));
     dmemToWriteback dmemToWriteback(.CLK(CLK), .RST(RST));
-    writebackToTop writebackToTop(.CLK(CLK), .RST(RST));
+    writebackToForward writebackToForward(.CLK(CLK), .RST(RST));
 
-    always_comb begin
-        //レジスタへ次の値を割り当て
-        general_reg[writebackToTop.fixed_rd] = writebackToTop.fixed_rd_value;
-        //インターフェースへの割り当て
-        fetchToDecode.curr_pc_reg = pc_reg;
-        topToExecOrDmem.curr_general_reg = general_reg;
-    end
+
     //モジュールのインスタンス化
-    fetcher fetcher(.fetchToDecode(fetchToDecode.fetch));
+    fetcher fetcher(.writebackToForward(writebackToForward.fetch), .fetchToDecode(fetchToDecode.fetch));
     decoder decoder(.fetchToDecode(fetchToDecode.decode), .decodeToExecOrDmem(decodeToExecOrDmem.decode));
-    exec exec(.decodeToExecOrDmem(decodeToExecOrDmem.execOrDmem), .execToWriteback(execToWriteback.exec), .topToExecOrDmem(topToExecOrDmem.exec));
-    memaccess memaccess(.decodeToExecOrDmem(decodeToExecOrDmem.execOrDmem), .topToExecOrDmem(topToExecOrDmem.dmem), .dmemToWriteback(dmemToWriteback.dmem));
-    writeback writeback(.execToWriteback(execToWriteback.writeback), .dmemToWriteback(dmemToWriteback.writeback), .writebackToTop(writebackToTop.writeback));
+    exec exec(.writebackToForward(writebackToForward.exec), .decodeToExecOrDmem(decodeToExecOrDmem.execOrDmem), .execToWriteback(execToWriteback.exec), .hazard(hazard.exec));
+    memaccess memaccess(.writebackToForward(writebackToForward.dmem), .decodeToExecOrDmem(decodeToExecOrDmem.execOrDmem), .dmemToWriteback(dmemToWriteback.dmem));
+    writeback writeback(.execToWriteback(execToWriteback.writeback), .dmemToWriteback(dmemToWriteback.writeback), .writebackToForward(writebackToForward.writeback));
     
     //実行ログ確認用の配線
     assign opcode = decodeToExecOrDmem.next_opcode;

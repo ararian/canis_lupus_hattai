@@ -1,6 +1,6 @@
 import defs::*;
 
-interface fetchToDecode(input logic CLK, RST);
+interface fetchToDecode(input logic CLK, RST, hazard.fToD hazard);
     reg[BIN_DIG-1:0] curr_pc_reg;
     reg[BIN_DIG-1:0] next_pc_reg;
     reg[BIN_DIG-1:0] curr_inst;
@@ -15,7 +15,7 @@ interface fetchToDecode(input logic CLK, RST);
         input next_inst
     );
     always_ff @(posedge CLK)begin
-        if(RST) begin
+        if(RST | hazard.ctrl_hazard) begin
             next_inst <= 32'h13;
             curr_pc_reg <= '0;
         end else begin
@@ -25,7 +25,7 @@ interface fetchToDecode(input logic CLK, RST);
     end
 endinterface
 
-interface decodeToExecOrDmem(input logic CLK, RST);
+interface decodeToExecOrDmem(input logic CLK, RST, hazard.dToED hazard);
     logic[BIN_DIG-1:0] curr_pc_reg;
     logic[6:0] curr_opcode;
     logic[4:0] curr_rd;
@@ -65,7 +65,7 @@ interface decodeToExecOrDmem(input logic CLK, RST);
         input next_imm
     );
     always_ff @(posedge CLK)begin
-        if(RST) begin
+        if(RST | hazard.ctrl_hazard) begin
             next_pc_reg <= '0;
             next_opcode <= 7'h13;
             next_rd <= '0;
@@ -104,17 +104,6 @@ interface execToWriteback(input CLK, RST);
     );
 endinterface
 
-interface topToExecOrDmem(input CLK, RST);
-    reg[31:0][BIN_DIG-1:0] curr_general_reg;
-
-    modport exec(
-        input curr_general_reg
-    );
-    modport dmem(
-        input curr_general_reg
-    );
-endinterface
-
 interface dmemToWriteback(input CLK, RST);
 
     logic [BIN_DIG-1:0] next_rd;
@@ -133,7 +122,7 @@ interface dmemToWriteback(input CLK, RST);
     );
 endinterface
 
-interface writebackToTop(input CLK, RST);
+interface writebackToForward(input CLK, RST);
 
     logic [BIN_DIG-1:0] next_pc_reg;
     logic [BIN_DIG-1:0] next_rd_value;
@@ -142,6 +131,7 @@ interface writebackToTop(input CLK, RST);
     logic [BIN_DIG-1:0] fixed_pc_reg;
     logic [BIN_DIG-1:0] fixed_rd_value;
     logic[4:0] fixed_rd;
+    reg[31:0][BIN_DIG-1:0] general_reg;
 
     modport writeback(
         output next_pc_reg, 
@@ -149,15 +139,60 @@ interface writebackToTop(input CLK, RST);
         output next_rd
     );
 
+    modport fetch(
+        input fixed_pc_reg 
+    );
+
+    modport exec(
+        input general_reg
+    );
+
+    modport dmem(
+        input general_reg
+    );
+
     always_ff @(posedge CLK)begin
         if(RST) begin
             fixed_pc_reg <= '0;
             fixed_rd <= 32'h0;
             fixed_rd_value <= 32'h0;
+            general_reg <= '0;
+        // end else if(ctrl_hazard)begin
+        //     pc_reg <= writebackForward.fixed_pc_reg;
+            // fixed_pc_reg <= next_pc_reg;
+        //     ctrl_hazard <= 1'b0;   
         end else begin
-            fixed_pc_reg <= next_pc_reg;
             fixed_rd <= next_rd;
             fixed_rd_value <= next_rd_value;
+            fixed_pc_reg <= fixed_pc_reg + 32'h4;
+            general_reg[next_rd] <= next_rd_value;
         end
     end
+endinterface
+
+interface hazard(input CLK, RST);
+    //制御ハザード用フラグ
+    logic branch, jamp;
+    logic ctrl_hazard;
+
+    assign ctrl_hazard = branch | jamp;
+
+    modport fToD(
+        input ctrl_hazard
+    );
+    modport dToED(
+        input ctrl_hazard
+    );
+    modport exec(
+        output branch, 
+        output jamp
+    );
+    always_ff @(posedge CLK)begin
+        if(RST | ctrl_hazard) begin
+            // ctrl_hazard <=1'b0;
+            branch <=1'b0;
+            jamp <=1'b0;
+        end
+    end
+
 endinterface
