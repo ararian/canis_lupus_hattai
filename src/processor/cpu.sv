@@ -47,6 +47,8 @@ module rv_cpu(
     always_ff @(posedge CLK)begin
         if (RST) begin
             general_reg <= '0;
+        end else begin
+            general_reg[writebackToTop.next_rd] <= writebackToTop.next_rd_value;
         end
     end
     //インターフェースのインスタンス化

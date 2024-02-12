@@ -7,7 +7,6 @@ module exec(
 );
 
 assign execToWriteback.next_rd = decodeToExecOrDmem.next_rd;
-reg tmp;
 //TODO：分岐命令実行時のフラッシュ処理等を実施する
 //TODO：共通部分のモジュール化
 
@@ -87,7 +86,6 @@ always_comb begin
             execToWriteback.next_rd_value = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] >>> topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs2];
         end
         SRA: begin
-            tmp = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1][31];
             execToWriteback.next_rd_value = $signed(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1]) >>> decodeToExecOrDmem.next_rs2;
         end
         OR: begin
@@ -146,8 +144,7 @@ always_comb begin
             execToWriteback.next_rd_value =  topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1] >>> decodeToExecOrDmem.next_imm[5:0];
         end
         SRAI: begin
-            assign tmp = topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1][31];
-            assign execToWriteback.next_rd_value = $signed(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1]) >>> decodeToExecOrDmem.next_imm[5:0];
+            execToWriteback.next_rd_value = $signed(topToExecOrDmem.curr_general_reg[decodeToExecOrDmem.next_rs1]) >>> decodeToExecOrDmem.next_imm[5:0];
         end
     endcase
 end

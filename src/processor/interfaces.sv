@@ -16,7 +16,7 @@ interface fetchToDecode(input logic CLK, RST);
     );
     always_ff @(posedge CLK)begin
         if(RST) begin
-            next_inst <= '0;
+            next_inst <= 32'h13;
             curr_pc_reg <= '0;
         end else begin
             next_inst <= curr_inst;
@@ -67,7 +67,7 @@ interface decodeToExecOrDmem(input logic CLK, RST);
     always_ff @(posedge CLK)begin
         if(RST) begin
             next_pc_reg <= '0;
-            next_opcode <= '0;
+            next_opcode <= 7'h13;
             next_rd <= '0;
             next_rs1 <= '0;
             next_rs2 <= '0;
@@ -152,6 +152,8 @@ interface writebackToTop(input CLK, RST);
     always_ff @(posedge CLK)begin
         if(RST) begin
             fixed_pc_reg <= '0;
+            fixed_rd <= 32'h0;
+            fixed_rd_value <= 32'h0;
         end else begin
             fixed_pc_reg <= next_pc_reg;
             fixed_rd <= next_rd;
