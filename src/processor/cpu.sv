@@ -27,7 +27,7 @@ module rv_cpu(
     execToWriteback execToWriteback(.CLK(CLK), .RST(RST));
     topToExecOrDmem topToExecOrDmem(.CLK(CLK), .RST(RST));
     dmemToWriteback dmemToWriteback(.CLK(CLK), .RST(RST));
-    writebackToForward writebackToForward(.CLK(CLK), .RST(RST));
+    writebackToForward writebackToForward(.CLK(CLK), .RST(RST), .hazard(hazard.wToF));
 
 
     //モジュールのインスタンス化

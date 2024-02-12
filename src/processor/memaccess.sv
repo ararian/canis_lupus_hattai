@@ -6,6 +6,8 @@ module memaccess(
     );
     logic [BIN_DIG-1:0]d_mem [MEM_SIZE-1:0];
     logic [BIN_DIG-1:0]addr;
+    initial
+        $readmemh("d_mem.txt", d_mem);
     assign dmemToWriteback.next_rd = decodeToExecOrDmem.next_rd;
 
     always_comb begin

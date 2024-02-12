@@ -10,6 +10,7 @@ module fetcher(
     initial
         $readmemh("i_mem.txt", i_mem);
     assign fetchToDecode.curr_inst = i_mem[writebackToForward.fixed_pc_reg];
+    assign fetchToDecode.curr_pc_reg = writebackToForward.fixed_pc_reg;
 
 endmodule
 

@@ -7,7 +7,7 @@ interface fetchToDecode(input logic CLK, RST, hazard.fToD hazard);
     reg[BIN_DIG-1:0] next_inst;
 
     modport fetch(
-        input curr_pc_reg,
+        output curr_pc_reg,
         output curr_inst
     );
     modport decode(
@@ -17,7 +17,7 @@ interface fetchToDecode(input logic CLK, RST, hazard.fToD hazard);
     always_ff @(posedge CLK)begin
         if(RST | hazard.ctrl_hazard) begin
             next_inst <= 32'h13;
-            curr_pc_reg <= '0;
+            next_pc_reg <= '0;
         end else begin
             next_inst <= curr_inst;
             next_pc_reg <= curr_pc_reg;
@@ -122,15 +122,13 @@ interface dmemToWriteback(input CLK, RST);
     );
 endinterface
 
-interface writebackToForward(input CLK, RST);
+interface writebackToForward(input CLK, RST, hazard.wToF hazard);
 
     logic [BIN_DIG-1:0] next_pc_reg;
     logic [BIN_DIG-1:0] next_rd_value;
     logic[4:0] next_rd;
 
     logic [BIN_DIG-1:0] fixed_pc_reg;
-    logic [BIN_DIG-1:0] fixed_rd_value;
-    logic[4:0] fixed_rd;
     reg[31:0][BIN_DIG-1:0] general_reg;
 
     modport writeback(
@@ -154,16 +152,11 @@ interface writebackToForward(input CLK, RST);
     always_ff @(posedge CLK)begin
         if(RST) begin
             fixed_pc_reg <= '0;
-            fixed_rd <= 32'h0;
-            fixed_rd_value <= 32'h0;
             general_reg <= '0;
-        // end else if(ctrl_hazard)begin
-        //     pc_reg <= writebackForward.fixed_pc_reg;
-            // fixed_pc_reg <= next_pc_reg;
-        //     ctrl_hazard <= 1'b0;   
+        end else if(hazard.ctrl_hazard)begin
+            fixed_pc_reg <= next_pc_reg;
+            general_reg[next_rd] <= next_rd_value;
         end else begin
-            fixed_rd <= next_rd;
-            fixed_rd_value <= next_rd_value;
             fixed_pc_reg <= fixed_pc_reg + 32'h4;
             general_reg[next_rd] <= next_rd_value;
         end
@@ -181,6 +174,9 @@ interface hazard(input CLK, RST);
         input ctrl_hazard
     );
     modport dToED(
+        input ctrl_hazard
+    );
+    modport wToF(
         input ctrl_hazard
     );
     modport exec(
