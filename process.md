@@ -9,9 +9,6 @@
 
 # TODOメモ
 - 回路図の整理
-- 制御ハザードの実装
-- データハザードの実装
-- バブル（≒nop）の実装
 - assertion記述の追加
 - debug用の配線を追加
 - if-else, case文でのdefault記述の追加
