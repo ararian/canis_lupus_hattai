@@ -16,7 +16,7 @@ module rv_cpu(
     logic[4:0] rs2;
     logic[2:0] funct3;
     logic[7:0] funct7;
-    logic[20:0] imm;
+    logic[BIN_DIG-1:0] imm;
 
     //制御ハザード用フラグ
     logic branch, jamp;

@@ -33,7 +33,7 @@ interface decodeToExecOrDmem(input logic CLK, RST);
     logic[4:0] curr_rs2;
     logic[2:0] curr_funct3;
     logic[7:0] curr_funct7;
-    logic[20:0] curr_imm;
+    logic[BIN_DIG-1:0] curr_imm;
 
     logic[BIN_DIG-1:0] next_pc_reg;
     logic[6:0] next_opcode;
@@ -42,7 +42,7 @@ interface decodeToExecOrDmem(input logic CLK, RST);
     logic[4:0] next_rs2;
     logic[2:0] next_funct3;
     logic[7:0] next_funct7;
-    logic[20:0] next_imm;
+    logic[BIN_DIG-1:0] next_imm;
 
     modport decode(
         output curr_pc_reg, 
