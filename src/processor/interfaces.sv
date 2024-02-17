@@ -16,6 +16,8 @@ interface fetchToDecode(input logic CLK, RST, hazard.fToD hazard);
     );
     always_ff @(posedge CLK)begin
         if(RST | hazard.ctrl_hazard) begin
+            curr_inst <= 32'h13;
+            curr_pc_reg <= '0;
             next_inst <= 32'h13;
             next_pc_reg <= '0;
         end else begin

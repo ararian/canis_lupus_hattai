@@ -21,6 +21,7 @@ module rv_cpu(
     writeback writeback(.execToWriteback(execToWriteback.writeback), .dmemToWriteback(dmemToWriteback.writeback), .writebackToForward(writebackToForward.writeback));
     
     //デコード命令
+    logic[BIN_DIG-1:0] pc_reg;
     logic[6:0] opcode;
     logic[4:0] rd;
     logic[4:0] rs1;
