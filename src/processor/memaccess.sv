@@ -1,3 +1,4 @@
+import defs::*;
 
 module memaccess(
     writebackToForward.dmem writebackToForward, 

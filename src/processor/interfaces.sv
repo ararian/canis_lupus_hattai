@@ -76,6 +76,14 @@ interface decodeToExecOrDmem(input logic CLK, RST, hazard.dToED hazard);
             next_funct3 <= '0;
             next_funct7 <= '0;
             next_imm <= '0;
+            curr_pc_reg <= '0;
+            curr_opcode <= 7'h13;
+            curr_rd <= '0;
+            curr_rs1 <= '0;
+            curr_rs2 <= '0;
+            curr_funct3 <= '0;
+            curr_funct7 <= '0;
+            curr_imm <= '0;
         end else begin
             next_pc_reg <= curr_pc_reg;
             next_opcode <= curr_opcode;

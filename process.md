@@ -9,6 +9,7 @@
 
 # TODOメモ
 - 回路図の整理
+- jamp命令実行時にpcレジスタが更新されるタイミングが適切か
 - assertion記述の追加
 - debug用の配線を追加
 - if-else, case文でのdefault記述の追加

@@ -13,10 +13,10 @@ assign execToWriteback.next_rd = decodeToExecOrDmem.next_rd;
 //J形式の命令記述
 always_comb begin
     if(decodeToExecOrDmem.next_opcode == JAL) begin
-        execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + {{11{decodeToExecOrDmem.next_imm[20]}}, decodeToExecOrDmem.next_imm[20:0]}; //TODO：rdが省かれると、x1と想定されるとは？
+        execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + $signed({{11{decodeToExecOrDmem.next_imm[20]}}, decodeToExecOrDmem.next_imm[20:0]}); //TODO：rdが省かれると、x1と想定されるとは？
         execToWriteback.next_rd_value = decodeToExecOrDmem.next_pc_reg + 32'h4;
         hazard.jamp = 1'b1;
-    end   
+    end
 end
 //B形式の命令記述
 always_comb begin
