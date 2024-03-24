@@ -7,7 +7,7 @@ module decoder(
 
     assign decodeToExecOrDmem.curr_pc_reg = fetchToDecode.next_pc_reg;
     assign decodeToExecOrDmem.curr_opcode = fetchToDecode.next_inst[6:0];
-
+    
     always_comb begin
         if(decodeToExecOrDmem.curr_opcode inside {7'h17, 7'h37})begin 
             decodeToExecOrDmem.curr_rd = fetchToDecode.next_inst[11:7]; decodeToExecOrDmem.curr_imm = {fetchToDecode.next_inst[31:12], 12'b0}; //U形式

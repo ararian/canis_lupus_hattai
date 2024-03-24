@@ -3,6 +3,11 @@ package defs;
     parameter BIN_DIG = 32;
 
     typedef enum logic [6:0]{
+        LUI = 7'h37,
+        AUIPC = 7'h17
+    }U_TYPE;
+
+    typedef enum logic [6:0]{
         JAL = 7'h6f
     } J_TYPE;
 

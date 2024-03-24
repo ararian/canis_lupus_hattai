@@ -10,15 +10,23 @@ module exec(
 assign execToWriteback.next_rd = decodeToExecOrDmem.next_rd;
 //TODO：共通部分のモジュール化
 
-//J形式の命令記述
+//U, J形式の命令記述
 always_comb begin
-    if(decodeToExecOrDmem.next_opcode == JAL) begin
-        execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + $signed({{11{decodeToExecOrDmem.next_imm[20]}}, decodeToExecOrDmem.next_imm[20:0]}); //TODO：rdが省かれると、x1と想定されるとは？
-        execToWriteback.next_rd_value = decodeToExecOrDmem.next_pc_reg + 32'h4;
-        hazard.jamp = 1'b1;
-    end
+    case(decodeToExecOrDmem.next_opcode) 
+        LUI: begin
+            execToWriteback.next_rd_value = $signed(decodeToExecOrDmem.next_imm[31:12] <<< 12);
+        end
+        AUIPC: begin
+            execToWriteback.next_rd_value = decodeToExecOrDmem.next_pc_reg + $signed(decodeToExecOrDmem.next_imm[31:12] <<< 12);
+        end
+        JAL: begin
+            execToWriteback.next_pc_reg = decodeToExecOrDmem.next_pc_reg + $signed({{11{decodeToExecOrDmem.next_imm[20]}}, decodeToExecOrDmem.next_imm[20:0]}); //TODO：rdが省かれると、x1と想定されるとは？
+            execToWriteback.next_rd_value = decodeToExecOrDmem.next_pc_reg + 32'h4;
+            hazard.jamp = 1'b1;
+        end
+    endcase
 end
-//B形式の命令記述
+//B形式の命令記述、I形式 c の命令記述
 always_comb begin
     case({decodeToExecOrDmem.next_funct3, decodeToExecOrDmem.next_opcode})
         BEQ: begin
@@ -57,6 +65,14 @@ always_comb begin
                 hazard.branch = 1'b1;
             end
         end      
+        //In order実装のため、具体的な動作は未実装
+        FENCE: begin
+            execToWriteback.next_rd_value = '0;
+        end
+        //In order実装のため、具体的な動作は未実装
+        FENCE_I: begin
+            execToWriteback.next_rd_value = '0;
+        end
     endcase
 end
 
